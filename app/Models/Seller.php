@@ -17,6 +17,7 @@ class Seller extends Model
         'seller_password',
         'seller_phone',
         'seller_store_name',
+        'user_role_id',
         'seller_created_at',
         'seller_updated_at',
     ];

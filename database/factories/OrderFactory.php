@@ -17,6 +17,7 @@ class OrderFactory extends Factory
     public function definition()
     {
         return [
+            'order_item_id' => \App\Models\OrderItem::factory(),
             'cust_id' => \App\Models\Customer::factory(),
             'order_date' => now(),
             'order_total' => $this->faker->numberBetween(100, 10000),

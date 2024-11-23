@@ -21,6 +21,7 @@ class CustomerFactory extends Factory
             'cust_password' => bcrypt('password'), // hashed password
             'cust_phone' => $this->faker->unique()->phoneNumber,
             'cust_address' => $this->faker->address,
+            'user_role' => $this->faker->word,
             'created_at' => now(),
             'updated_at' => now(),
         ];

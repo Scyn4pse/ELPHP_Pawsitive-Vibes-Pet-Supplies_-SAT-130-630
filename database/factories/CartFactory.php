@@ -18,6 +18,7 @@ class CartFactory extends Factory
     {
         return [
             'cust_id' => \App\Models\Customer::factory(),
+            'cart_item_id' => \App\Models\CartItem::factory(),
             'created_at' => now(),
             'updated_at' => now(),
         ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CartItemController extends Controller
 {
@@ -16,11 +17,15 @@ class CartItemController extends Controller
     // Create a new cart item
     public function store(Request $request)
     {
-        $request->validate([
-            'cart_id' => 'required|exists:carts,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
+        $validator = Validator::make($request->all(), [
+            'prod_id' => 'required|exists:products,id',
+            'cart_item_quantity' => 'required|integer|min:1',
+            'cart_item_price' => 'required|numeric',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
 
         $cartItem = CartItem::create($request->all());
         return response()->json($cartItem, 201);

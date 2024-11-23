@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
 {
@@ -14,26 +15,40 @@ class CustomerController extends Controller
     }
 
     // Create a new customer
-    public function store(Request $request)
+    public function customerSignup(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:customers,email',
-            'password' => 'required|string',
+            'cust_name' => 'required|string|max:255',
+            'cust_email' => 'required|email|unique:Customer,cust_email',
+            'cust_password' => 'required|string|min:6',
+            'cust_phone' => 'required|string|unique:Customer,cust_phone',
+            'cust_address' => 'nullable|string|max:255',
         ]);
 
-        $customer = Customer::create($request->all());
+        $customer = Customer::create([
+            'cust_name' => $request->cust_name,
+            'cust_email' => $request->cust_email,
+            'cust_password' => bcrypt($request->cust_password),
+            'cust_phone' => $request->cust_phone,
+            'cust_address' => $request->cust_address,
+            'user_role' => 'Customer', // If roles are simple strings
+        ]);
+
         return response()->json($customer, 201);
     }
 
     // Get a specific customer
-    public function show($id)
+    public function getCustomer($id)
     {
         return response()->json(Customer::findOrFail($id));
     }
+    public function getAllCustomers() {
+        $customers = Customer::all();
+        return response()->json($customers);
+    }
 
     // Update customer details
-    public function update(Request $request, $id)
+    public function updateCustomer(Request $request, $id)
     {
         $customer = Customer::findOrFail($id);
         $customer->update($request->all());
@@ -41,7 +56,7 @@ class CustomerController extends Controller
     }
 
     // Delete customer
-    public function destroy($id)
+    public function deleteCustomer($id)
     {
         $customer = Customer::findOrFail($id);
         $customer->delete();

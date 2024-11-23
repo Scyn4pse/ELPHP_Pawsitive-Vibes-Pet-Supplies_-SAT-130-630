@@ -11,11 +11,10 @@ class CartItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cart_id',
-        'cust_id',
+        'cart_item_id',
         'prod_id',
-        'cart_quantity',
-        'cart_price',
+        'cart_item_quantity',
+        'cart_item_price',
     ];
     
     protected $table = 'CartItem';

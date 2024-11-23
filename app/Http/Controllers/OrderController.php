@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -16,10 +17,17 @@ class OrderController extends Controller
     // Create a new order
     public function store(Request $request)
     {
-        $request->validate([
-            'customer_id' => 'required|exists:customers,id',
+        $validator = Validator::make($request->all(), [
+            'cust_id' => 'required|exists:customers,id',
+            'order_item_id' => 'required|exists:order_items,id',
             'total_amount' => 'required|numeric',
+            'order_date' => 'required|date',
+            'order_status' => 'required|in:pending,completed,cancelled',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
 
         $order = Order::create($request->all());
         return response()->json($order, 201);

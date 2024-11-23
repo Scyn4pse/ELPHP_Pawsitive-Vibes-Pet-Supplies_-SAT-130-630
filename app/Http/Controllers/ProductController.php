@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\SellerController;
 
 class ProductController extends Controller
 {
@@ -14,40 +16,68 @@ class ProductController extends Controller
     }
 
     // Create a new product
-    public function store(Request $request)
+    public function createProduct(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'image' > 'required|string',
-            'description' => 'required|string',
-            'price' => 'required|numeric',
-            'seller_id' => 'required|exists:sellers,id',
-        ]);
+        $seller = \App\Models\Seller::find('seller_id');
 
-        $product = Product::create($request->all());
-        return response()->json($product, 201);
+        if (!$seller){
+            return response()->json(['message' => 'Only seller can upload products'], 404);
+        }
+        else{
+            $validator = Validator::make($request->all(), [
+                'prod_name' => 'required|string|max:255',
+                'prod_description' => 'required|string',
+                'prod_price' => 'required|numeric',
+                'prod_quantity' => 'required|integer',
+                'prod_image' => 'required|string',
+                'prod_seller_id' => 'required|integer',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+            $product = Product::create($request->all());
+            return response()->json($product, 201);
+        }
     }
 
-    // Get a specific product
-    public function show($id)
-    {
-        return response()->json(Product::findOrFail($id));
+    public function getProduct($id){
+        $product = Product::findOrFail($id);
+        return response()->json($product);
+    }
+    public function getAllProducts() {
+        $products = Product::all();
+        return response()->json($products);
     }
 
     // Update product details
-    public function update(Request $request, $id)
+    public function updateProduct(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $seller = \App\Models\Seller::find('seller_id');
+
+        if (!$seller){
+            return response()->json(['message' => 'Only seller can update products'], 404);
+        }
+        else{
+            $product = Product::findOrFail($id);
         $product->update($request->all());
         return response()->json($product);
+        }
     }
 
     // Delete product
-    public function destroy($id)
+    public function deleteProduct($id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
-        return response()->json(null, 204);
+        $seller = \App\Models\Seller::find('seller_id');
+
+        if (!$seller){
+            return response()->json(['message' => 'Only seller can delete products'], 404);
+        }
+        else{
+            $product = Product::findOrFail($id);
+            $product->delete();
+            return response()->json(null, 204);
+        }
     }
 }
 

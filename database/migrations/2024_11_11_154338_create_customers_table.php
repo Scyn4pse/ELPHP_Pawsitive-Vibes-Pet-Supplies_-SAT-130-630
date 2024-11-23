@@ -18,7 +18,11 @@ return new class extends Migration
             $table->string('cust_password', 225);  // Password column
             $table->string('cust_phone', 225)->unique();  // Phone column (unique)
             $table->string('cust_address', 225);  // Address column (required by default)
+            $table->unsignedBigInteger('user_role_id');
             $table->timestamps();  // Automatically adds created_at and updated_at columns
+
+            $table->foreign('user_role_id')->references('user_role_id')->on('UserRole')
+                            ->onDelete('cascade');
         });
     }
 
