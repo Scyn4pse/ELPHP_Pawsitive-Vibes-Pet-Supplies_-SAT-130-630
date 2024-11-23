@@ -17,7 +17,7 @@ class Customer extends Model
         'cust_password',
         'cust_phone',
         'cust_address',
-        'user_role_id',
+        'user_role',
         'cust_created_at',
         'cust_updated_at',
     ];
