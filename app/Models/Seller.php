@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class Seller extends Model
 {
     /** @use HasFactory<\Database\Factories\SellerFactory> */
     use HasFactory;
+    use HasApiTokens;
 
     // Define which attributes are mass assignable
     protected $fillable = [
@@ -24,4 +28,11 @@ class Seller extends Model
 
     // Optionally, you can also define the table name if it is not the plural of the model name
     protected $table = 'Seller';
+    protected $primaryKey = 'seller_id';
+
+    // Define the relationship to tokens
+    public function tokens()
+    {
+        return $this->morphMany(PersonalAccessToken::class, 'tokenable');
+    }
 }

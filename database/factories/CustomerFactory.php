@@ -17,7 +17,8 @@ class CustomerFactory extends Factory
     public function definition()
     {
         return [
-            'cust_name' => $this->faker->unique()->name,
+            'cust_name' => $this->faker->name,
+            'cust_email' => $this->faker->unique()->safeEmail,
             'cust_password' => bcrypt('password'), // hashed password
             'cust_phone' => $this->faker->unique()->phoneNumber,
             'cust_address' => $this->faker->address,

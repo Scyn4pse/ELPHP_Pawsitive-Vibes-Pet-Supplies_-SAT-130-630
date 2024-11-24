@@ -4,15 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\PersonalAccessToken;
+
 
 class Customer extends Model
 {
     use HasFactory;
+    use HasApiTokens;
 
     // Define which attributes are mass assignable
     protected $fillable = [
-        'cust_id',
-        'cust_name', // Add this line to allow mass assignment for cust_name
+        'cust_name', 
         'cust_email',
         'cust_password',
         'cust_phone',
@@ -21,7 +25,12 @@ class Customer extends Model
         'cust_created_at',
         'cust_updated_at',
     ];
-
-    // Optionally, you can also define the table name if it is not the plural of the model name
     protected $table = 'Customer';
+    protected $primaryKey = 'cust_id';
+
+    // Define the relationship to tokens
+    public function tokens()
+    {
+        return $this->morphMany(PersonalAccessToken::class, 'tokenable');
+    }
 }

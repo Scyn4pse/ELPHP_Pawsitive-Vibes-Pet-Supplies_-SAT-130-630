@@ -37,6 +37,58 @@ class SellerController extends Controller
 
         return response()->json($seller, 201);
     }
+    //seller login
+    public function sellerLogin(Request $request)
+    {
+        $request->validate([
+            'seller_email' => 'required|email',
+            'seller_password' => 'required|string|min:6'
+        ]);
+
+        $seller = Seller::where('seller_email', $request->seller_email)->first();
+
+        // Check if the customer exists and the password is correct
+        if ($seller && Hash::check($request->seller_password, $seller->seller_password)) {
+            // Generate a personal access token
+            if($seller->seller_id){
+                $sellerToken = $seller->createToken('SellerToken')->plainTextToken;
+
+            // Return a success response with the token
+            return response()->json([
+                'message' => 'Seller login successful',
+                'token' => $sellerToken,
+            ], 200);
+            } else {
+                return response()->json(['error' => 'Customer not found or invalid ID'], 404);
+            }
+        } 
+        return response()->json(['error' => 'Invalid credentials'], 401);
+    }
+
+    // Seller Logout
+    public function sellerLogout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Seller logged out successfully'], 200);
+    }
+
+    // Seller Forgot Password
+    public function sellerForgetPassword(Request $request)
+    {
+        $request->validate(['seller_email' => 'required|email']);
+
+        $seller = Seller::where('seller_email', $request->seller_email)->first();
+
+        if ($seller) {
+            $newPassword = 'new_password'; // Generate a new password
+            $seller->seller_password = Hash::make($newPassword);
+            $seller->save();
+
+            return response()->json(['message' => 'Password reset successful'], 200);
+        } else {
+            return response()->json(['error' => 'Seller not found'], 404);
+        }
+    }
 
     // Get a specific seller
     public function getSeller($id)

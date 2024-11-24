@@ -13,16 +13,14 @@ return new class extends Migration
     {
         Schema::create('Customer', function (Blueprint $table) {
             $table->id('cust_id');
-            $table->string('cust_email', 255)->unique();  // Unique email column
-            $table->string('cust_name', 255);  // Name column (required by default)
-            $table->string('cust_password', 225);  // Password column
-            $table->string('cust_phone', 225)->unique();  // Phone column (unique)
-            $table->string('cust_address', 225);  // Address column (required by default)
-            $table->unsignedBigInteger('user_role_id');
-            $table->timestamps();  // Automatically adds created_at and updated_at columns
+        $table->string('cust_name', 255);  
+        $table->string('cust_email', 255)->unique();  
+        $table->string('cust_password', 225);  
+        $table->string('cust_phone', 225)->unique();  
+        $table->string('cust_address', 225);  
+        $table->string('user_role', 255);
+        $table->timestamps();
 
-            $table->foreign('user_role_id')->references('user_role_id')->on('UserRole')
-                            ->onDelete('cascade');
         });
     }
 

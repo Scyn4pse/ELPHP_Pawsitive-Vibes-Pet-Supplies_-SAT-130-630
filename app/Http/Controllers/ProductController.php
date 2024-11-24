@@ -17,29 +17,43 @@ class ProductController extends Controller
 
     // Create a new product
     public function createProduct(Request $request)
-    {
-        $seller = \App\Models\Seller::find('seller_id');
+{
+    // Assume the `seller_id` is passed as part of the request or obtained from authentication
+    $sellerId = $request->user()->id; // Use this if authenticated sellers create products
 
-        if (!$seller){
-            return response()->json(['message' => 'Only seller can upload products'], 404);
-        }
-        else{
-            $validator = Validator::make($request->all(), [
-                'prod_name' => 'required|string|max:255',
-                'prod_description' => 'required|string',
-                'prod_price' => 'required|numeric',
-                'prod_quantity' => 'required|integer',
-                'prod_image' => 'required|string',
-                'prod_seller_id' => 'required|integer',
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 400);
-            }
-            $product = Product::create($request->all());
-            return response()->json($product, 201);
-        }
+    // Check if the seller exists
+    $seller = \App\Models\Seller::find($sellerId);
+
+    if (!$seller) {
+        return response()->json(['message' => 'Only sellers can upload products'], 403); // 403 Forbidden for unauthorized access
     }
+
+    // Validate the product details
+    $validator = Validator::make($request->all(), [
+        'prod_name' => 'required|string|max:255',
+        'prod_description' => 'required|string',
+        'prod_price' => 'required|numeric',
+        'prod_quantity' => 'required|integer',
+        'prod_image' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 400);
+    }
+
+    // Create the product and associate it with the seller
+    $product = \App\Models\Product::create([
+        'seller_id' => $seller->id, // Associate the product with the seller
+        'prod_name' => $request->input('prod_name'),
+        'prod_description' => $request->input('prod_description'),
+        'prod_price' => $request->input('prod_price'),
+        'prod_quantity' => $request->input('prod_quantity'),
+        'prod_image' => $request->input('prod_image'),
+    ]);
+
+    return response()->json($product, 201);
+}
+
 
     public function getProduct($id){
         $product = Product::findOrFail($id);
