@@ -22,7 +22,7 @@ class Seller extends Authenticatable
         'seller_email',
         'seller_password',
         'seller_phone',
-        'seller_store_name',
+        'seller_address',
         'user_role',
         'seller_created_at',
         'seller_updated_at',

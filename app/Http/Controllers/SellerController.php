@@ -16,7 +16,8 @@ class SellerController extends Controller
             'seller_email' => 'required|email|unique:Seller,seller_email',
             'seller_password' => 'required|string|min:6',
             'seller_phone' => 'required|string|unique:Seller,seller_phone|max:255',
-            'seller_store_name' => 'required|string|max:255',
+            'seller_address' => 'nullable|string|max:255',
+            'user_role' => 'required|string|max:255',
         ]);
 
         $seller = Seller::create([
@@ -24,7 +25,7 @@ class SellerController extends Controller
             'seller_email' => $request->seller_email,
             'seller_password' => Hash::make($request->seller_password),
             'seller_phone' => $request->seller_phone,
-            'seller_store_name' => $request->seller_store_name,
+            'seller_address' => $request->seller_address,
             'user_role' => 'Seller',
         ]);
 

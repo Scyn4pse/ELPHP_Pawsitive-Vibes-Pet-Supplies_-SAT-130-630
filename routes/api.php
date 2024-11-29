@@ -17,6 +17,7 @@ use App\Http\Controllers\NotificationController;
 Route::post('customer/register', [CustomerController::class, 'customerSignup']);
 Route::post('customer/login', [CustomerController::class, 'customerLogin']);
 Route::middleware('auth:sanctum')->post('/customer/logout', [CustomerController::class, 'customerLogout']);
+Route::post('customer/verify-email', [CustomerController::class, 'verifyEmail']);
 Route::post('customer/forgot-password', [CustomerController::class, 'customerForgetPassword']);
 Route::get('customer/get-customer-by-id', [CustomerController::class, 'getCustomer']);
 Route::get('customer/all-customers',[CustomerController::class, 'getAllCustomers']);

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('seller_email', 255)->unique();
             $table->string('seller_password', 255);
             $table->string('seller_phone', 255)->unique();
-            $table->string('seller_store_name', 255);
+            $table->string('seller_address', 255);
             $table->string('user_role',255);
             $table->timestamps();
 

@@ -19,6 +19,7 @@ class CustomerController extends Controller
         'cust_password' => 'required|string|min:6',
         'cust_phone' => 'required|string|unique:Customer,cust_phone',
         'cust_address' => 'nullable|string|max:255',
+        'user_role' => 'required|string|max:255'
     ]);
 
     $customer = Customer::create([
@@ -27,7 +28,7 @@ class CustomerController extends Controller
         'cust_password' => bcrypt($request->cust_password),
         'cust_phone' => $request->cust_phone,
         'cust_address' => $request->cust_address,
-        'user_role' => 'Customer',
+        'user_role' => $request->user_role,
     ]);
 
     return response()->json([
@@ -36,29 +37,28 @@ class CustomerController extends Controller
     ], 201);
 }
 // Customer Login
-public function customerLogin(Request $request)
+public function login(Request $request)
 {
-    // Validate the request inputs
-    $request->validate([
-        'cust_email' => 'required|email',
-        'cust_password' => 'required|string|min:6',
-    ]);
-
-    // Find the customer by email
-    $customer = Customer::where('cust_email', $request->cust_email)->first();
-
-    // Check if customer exists and password is correct
-    if ($customer && Hash::check($request->cust_password, $customer->cust_password)) {
-        
-        $customerToken = $customer->createToken('CustomerToken')->plainTextToken;
-  
-            return response()->json([
-                'message' => 'Customer login successful',
-                'token' => $customerToken,
-            ], 200);
+    // Check if the user exists in the Customer table
+    $user = Customer::where('email', $request->email)->first();
+    
+    // If not found in Customer table, check Seller table
+    if (!$user) {
+        $user = Seller::where('email', $request->email)->first();
     }
-    return response()->json(['error' => 'Invalid credentials'], 401);
+
+    if ($user && Hash::check($request->password, $user->password)) {
+        // If password matches, return success with the user's role
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $user->createToken('AppName')->plainTextToken,
+            'role' => $user instanceof Seller ? 'Seller' : 'Customer'
+        ]);
+    }
+
+    return response()->json(['message' => 'Invalid credentials'], 401);
 }
+
 
 
     // Customer Logout
@@ -75,7 +75,7 @@ public function customerLogin(Request $request)
         'new_password' => 'required|string|min:6|confirmed',
     ]);
 
-        $customer = Customer::where('cust_email', $request->cust_email)->first();
+    $customer = Customer::where('cust_email', $request->cust_email)->first();
 
         if ($customer) {
             $customer->cust_password = Hash::make($request->new_password);
@@ -86,6 +86,20 @@ public function customerLogin(Request $request)
             return response()->json(['error' => 'Customer not found'], 404);
         }
     }
+    //verify email
+    public function verifyEmail(Request $request)
+{
+    $request->validate(['cust_email' => 'required|email']);
+
+    $customer = Customer::where('cust_email', $request->cust_email)->first();
+
+    if ($customer) {
+        return response()->json(['message' => 'Email exists'], 200);
+    } else {
+        return response()->json(['error' => 'Email not found'], 404);
+    }
+}
+
 
     // Get a specific customer
     public function getCustomer(Request $request)
