@@ -13,34 +13,60 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\NotificationController;
 
-//Role routes
-Route::get('/roles', [AuthController::class, 'handleRoleSelection']);
-
 //Customer routes
-Route::post('register/customer', [CustomerController::class, 'customerSignup']);
-Route::post('login/customer', [AuthController::class, 'customerLogin']);
-Route::post('customer/logout', [AuthController::class, 'customerLogout']);
-Route::post('forget-password/customer', [AuthController::class, 'customerForgetPassword']);
-Route::get('customer/find-customer/{id}', [CustomerController::class, 'getCustomer']);
-Route::get('customer/allCustomer',[CustomerController::class, 'getAllCustomers']);
-Route::patch('customer/update-customer/{id}', [CustomerController::class, 'updateCustomer']);
-Route::delete('customer/delete-customer/{id}', [CustomerController::class, 'deleteCustomer']);
+Route::post('customer/register', [CustomerController::class, 'customerSignup']);
+Route::post('customer/login', [CustomerController::class, 'customerLogin']);
+Route::middleware('auth:sanctum')->post('/customer/logout', [CustomerController::class, 'customerLogout']);
+Route::post('customer/forgot-password', [CustomerController::class, 'customerForgetPassword']);
+Route::get('customer/get-customer-by-id', [CustomerController::class, 'getCustomer']);
+Route::get('customer/all-customers',[CustomerController::class, 'getAllCustomers']);
+Route::patch('customer/update-customer/', [CustomerController::class, 'updateCustomer']);
+Route::delete('customer/delete-customer/', [CustomerController::class, 'deleteCustomer']);
 //Seller routes
-Route::post('register/seller', [SellerController::class, 'sellerSignup']);
-Route::post('login/seller', [AuthController::class, 'sellerLogin']);
-Route::post('seller/logout', [AuthController::class, 'sellerLogout']);
-Route::post('forget-password/seller', [AuthController::class, 'sellerForgetPassword']);
-Route::get('seller/find-seller/{id}', [SellerController::class, 'getSeller']);
-Route::get('seller/allSeller',[SellerController::class, 'getAllSellers']);
-Route::patch('seller/update-seller/{id}', [SellerController::class, 'updateSeller']);
-Route::delete('seller/delete-seller/{id}', [SellerController::class, 'deleteSeller']);
+Route::post('seller/register', [SellerController::class, 'sellerSignup']);
+Route::post('seller/login', [SellerController::class, 'sellerLogin']);
+Route::middleware('auth:sanctum')->post('/seller/logout', [SellerController::class, 'sellerLogout']);
+Route::post('seller/forgot-password', [SellerController::class, 'sellerForgetPassword']);
+Route::get('seller/get-seller-by-id', [SellerController::class, 'getSeller']);
+Route::get('seller/all-sellers',[SellerController::class, 'getAllSellers']);
+Route::patch('seller/update-seller/', [SellerController::class, 'updateSeller']);
+Route::delete('seller/delete-seller/', [SellerController::class, 'deleteSeller']);
 //Product routes
-Route::post('products/store', [ProductController::class, 'createProduct']);
-Route::get('products/find-product/{id}', [ProductController::class, 'getProduct']);
-Route::get('products/allProducts', [ProductController::class, 'getAllProducts']);
-Route::patch('products/update-product/{id}', [ProductController::class, 'updateProduct']);
-Route::delete('products/delete-product/{id}', [ProductController::class, 'deleteProduct']);
+Route::middleware('auth:sanctum')->post('products/upload-product', [ProductController::class, 'uploadProduct']);
+Route::get('products/get-product-by-id', [ProductController::class, 'getProduct']);
+Route::get('products/all-products', [ProductController::class, 'getAllProducts']);
+Route::patch('products/update-product/', [ProductController::class, 'updateProduct']);
+Route::delete('products/delete-product/', [ProductController::class, 'deleteProduct']);
 //Cart routes
+Route::middleware('auth:sanctum')->post('cart/add-to-cart', [CartController::class, 'addToCart']);
+Route::get('cart/get-cart-by-id/', [CartController::class, 'getCart']);
+Route::get('cart/all-carts', [CartController::class, 'getAllCarts']);
+Route::patch('cart/update-cart/', [CartController::class, 'updateCart']);
+Route::delete('cart/delete-cart/', [CartController::class, 'deleteCart']);
+//CartItem routes
+Route::middleware('auth:sanctum')->post('cart-item/add-to-cart-item', [CartItemController::class, 'addToCartItem']);
+Route::get('cart-item/get-cart-item-by-id/', [CartItemController::class, 'getCartItem']);
+Route::get('cart-item/all-cart-item', [CartItemController::class, 'getAllCartItems']);
+Route::patch('cart-item/update-cart-item/', [CartItemController::class, 'updateCartItem']);
+Route::delete('cart-item/delete-cart-item/', [CartItemController::class, 'deleteCartItem']);
+//Order routes
+Route::middleware('auth:sanctum')->post('order/add-to-order', [OrderController::class, 'addToOrder']);
+Route::get('order/get-order-by-id/', [OrderController::class, 'getOrder']);
+Route::get('order/all-orders', [OrderController::class, 'getAllOrders']);
+Route::patch('order/update-order/', [OrderController::class, 'updateOrder']);
+Route::delete('order/delete-order/', [OrderController::class, 'deleteOrder']);
+//OrderItem routes
+Route::middleware('auth:sanctum')->post('order-item/add-to-order-item', [OrderItemController::class, 'addToOrderItem']);
+Route::get('order-item/get-order-item-by-id/', [OrderItemController::class, 'getOrderItem']);
+Route::get('order-item/all-order-items', [OrderItemController::class, 'getAllOrderItems']);
+Route::patch('order-item/update-order-item/', [OrderItemController::class, 'updateOrderItem']);
+Route::delete('order-item/delete-order-item/', [OrderItemController::class, 'deleteOrderItem']);
+//Notification routes
+Route::middleware('auth:sanctum')->post('notification/create-notification', [NotificationController::class, 'createNotifications']);
+Route::get('notification/get-notification/', [NotificationController::class, 'getNotification']);
+Route::get('notification/all-notification', [NotificationController::class, 'getAllNotifications']);
+Route::patch('notification/update-notification/', [NotificationController::class, 'updateNotification']);
+Route::delete('notification/delete-notification/', [NotificationController::class, 'deleteNotification']);
 
 
 

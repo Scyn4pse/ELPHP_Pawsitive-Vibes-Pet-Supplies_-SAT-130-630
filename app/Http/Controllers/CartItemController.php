@@ -15,7 +15,7 @@ class CartItemController extends Controller
     }
 
     // Create a new cart item
-    public function store(Request $request)
+    public function addToCartItem(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'prod_id' => 'required|exists:products,id',
@@ -32,21 +32,42 @@ class CartItemController extends Controller
     }
 
     // Get a specific cart item
-    public function show($id)
+    public function getCartItem($id)
     {
         return response()->json(CartItem::findOrFail($id));
     }
+    public function getAllCartItems() {
+        $cartItems = CartItem::all();
+        return response()->json($cartItems);
+    }
 
     // Update cart item details
-    public function update(Request $request, $id)
+    public function updateCartItem(Request $request, $id)
     {
+        // Find the cart item by ID or fail
         $cartItem = CartItem::findOrFail($id);
-        $cartItem->update($request->all());
-        return response()->json($cartItem);
+
+        // Validate incoming request data
+        $validator = Validator::make($request->all(), [
+            'quantity' => 'sometimes|required|integer|min:1',
+            'price' => 'sometimes|required|numeric|min:0',
+            // Add other fields as necessary
+        ]);
+
+        // Return validation errors if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Update the cart item with validated data
+        $cartItem->update($request->only(['quantity', 'price'])); // Specify fields to update
+
+        // Return the updated cart item with a success response
+        return response()->json($cartItem, 200);
     }
 
     // Delete cart item
-    public function destroy($id)
+    public function deleteCartItem($id)
     {
         $cartItem = CartItem::findOrFail($id);
         $cartItem->delete();

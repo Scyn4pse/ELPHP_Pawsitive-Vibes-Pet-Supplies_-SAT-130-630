@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id('prod_id');
             $table->unsignedBigInteger('seller_id');
             $table->string('prod_name', 225)->unique();
-            $table->string('prod_image', 225)->unique();
             $table->string('prod_description', 225)->nullable(); 
             $table->double('prod_price');
             $table->integer('prod_quantity');
+            $table->string('prod_image', 225)->unique();
             $table->timestamps();
 
             $table->foreign('seller_id')->references('seller_id')->on('Seller')

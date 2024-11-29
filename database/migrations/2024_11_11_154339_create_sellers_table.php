@@ -18,11 +18,9 @@ return new class extends Migration
             $table->string('seller_password', 255);
             $table->string('seller_phone', 255)->unique();
             $table->string('seller_store_name', 255);
-            $table->unsignedBigInteger('user_role_id');
+            $table->string('user_role',255);
             $table->timestamps();
 
-            $table->foreign('user_role_id')->references('user_role_id')->on('UserRole')
-                            ->onDelete('cascade');
         });
     }
 
