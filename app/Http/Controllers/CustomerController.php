@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Seller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -36,26 +37,45 @@ class CustomerController extends Controller
         $customer
     ], 201);
 }
-// Customer Login
-public function login(Request $request)
+// User Login
+public function customerLogin(Request $request)
 {
-    // Check if the user exists in the Customer table
-    $user = Customer::where('email', $request->email)->first();
-    
-    // If not found in Customer table, check Seller table
+    $request->validate([
+        'cust_email' => 'required|email',
+        'cust_password' => 'required|string|min:6',
+    ]);
+
+    // Attempt to find user in the Customer table
+    $user = Customer::where('cust_email', $request->cust_email)->first();
+
+    // Check if the user exists in the Seller table if not found in Customer
+    $isSeller = false; // Track whether the user is a seller
     if (!$user) {
-        $user = Seller::where('email', $request->email)->first();
+        $user = Seller::where('seller_email', $request->cust_email)->first();
+        $isSeller = true;
     }
 
-    if ($user && Hash::check($request->password, $user->password)) {
-        // If password matches, return success with the user's role
-        return response()->json([
-            'message' => 'Login successful',
-            'token' => $user->createToken('AppName')->plainTextToken,
-            'role' => $user instanceof Seller ? 'Seller' : 'Customer'
-        ]);
+    // Validate credentials
+    if ($user) {
+        $passwordField = $isSeller ? 'seller_password' : 'cust_password';
+        if (Hash::check($request->cust_password, $user->$passwordField)) {
+            // Determine the role
+            $role = $isSeller ? 'Seller' : 'Customer';
+
+            // Generate a token with a role-specific name
+            $tokenName = $role . 'Token';
+            $token = $user->createToken($tokenName)->plainTextToken;
+
+            return response()->json([
+                'message' => "$role login successful",
+                'token' => $token,
+                'role' => $role,
+                'seller_id' => $user->seller_id,
+            ], 200);
+        }
     }
 
+    // If authentication fails
     return response()->json(['message' => 'Invalid credentials'], 401);
 }
 

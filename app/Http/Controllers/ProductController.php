@@ -18,68 +18,70 @@ class ProductController extends Controller
 
     // Create a new product
     public function uploadProduct(Request $request)
-{
-    // Get the authenticated seller using Sanctum
-    $seller = auth('api')->user();
+    {
+        // Get the authenticated seller using Sanctum
+        $seller = auth('api')->user();
 
-    // Check if the seller is authenticated
-    if (!$seller) {
-        return response()->json(['message' => 'Only sellers can upload products'], 403);
-    }
+        // Check if the seller is authenticated
+        if (!$seller) {
+            return response()->json(['message' => 'Only sellers can upload products'], 403);
+        }
 
-    // Log the authenticated seller's ID for debugging
-    Log::info('Authenticated Seller:', ['seller_id' => $seller->seller_id]);
+        // Log the authenticated seller's ID for debugging
+        Log::info('Authenticated Seller:', ['seller_id' => $seller->seller_id]);
 
-    // Validate the product details
-    $validator = Validator::make($request->all(), [
-        'prod_name' => 'required|string|max:255',
-        'prod_description' => 'required|string',
-        'prod_price' => 'required|numeric',
-        'prod_quantity' => 'required|integer',
-        'prod_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    // Check if validation fails
-    if ($validator->fails()) {
-        return response()->json(['error' => $validator->errors()], 400);
-    }
-
-    // Handle the image file upload
-    $imageUrl = null;
-    if ($request->hasFile('prod_image')) {
-        $file = $request->file('prod_image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('images'), $filename);
-        $imageUrl = 'images/' . $filename;
-    }
-
-    // Attempt to create the product
-    try {
-        $product = Product::create([
-            'seller_id' => $seller->seller_id, // Use the authenticated seller's ID
-            'prod_name' => $request->input('prod_name'),
-            'prod_description' => $request->input('prod_description'),
-            'prod_price' => $request->input('prod_price'),
-            'prod_quantity' => $request->input('prod_quantity'),
-            'prod_image' => $imageUrl,
+        // Validate the product details
+        $validator = Validator::make($request->all(), [
+            'prod_name' => 'required|string|max:255',
+            'prod_description' => 'required|string',
+            'prod_price' => 'required|numeric',
+            'prod_quantity' => 'required|integer',
+            'prod_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    } catch (\Exception $e) {
-        Log::error('Product creation failed:', [
-            'error' => $e->getMessage(),
-            'seller_id' => $seller->seller_id,
-            'input' => $request->all()
-        ]);
-        return response()->json(['error' => 'Product creation failed: ' . $e->getMessage()], 500);
-    }
 
-    // Return the created product as a response
-    return response()->json($product, 201);
-}
-    public function getProduct($id){
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+
+        // Handle the image file upload
+        $imageUrl = null;
+        if ($request->hasFile('prod_image')) {
+            $file = $request->file('prod_image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $filename);
+            $imageUrl = 'images/' . $filename;
+        }
+
+        // Attempt to create the product
+        try {
+            $product = Product::create([
+                'seller_id' => $seller->seller_id, // Use the authenticated seller's ID
+                'prod_name' => $request->input('prod_name'),
+                'prod_description' => $request->input('prod_description'),
+                'prod_price' => $request->input('prod_price'),
+                'prod_quantity' => $request->input('prod_quantity'),
+                'prod_image' => $imageUrl,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Product creation failed:', [
+                'error' => $e->getMessage(),
+                'seller_id' => $seller->seller_id,
+                'input' => $request->all()
+            ]);
+            return response()->json(['error' => 'Product creation failed: ' . $e->getMessage()], 500);
+        }
+
+        // Return the created product as a response
+        return response()->json($product, 201);
+    }
+    public function getProduct($id)
+    {
         $product = Product::findOrFail($id);
         return response()->json($product);
     }
-    public function getAllProducts() {
+    public function getAllProducts()
+    {
         $products = Product::all();
         return response()->json($products);
     }
@@ -89,13 +91,12 @@ class ProductController extends Controller
     {
         $seller = \App\Models\Seller::find('seller_id');
 
-        if (!$seller){
+        if (!$seller) {
             return response()->json(['message' => 'Only seller can update products'], 404);
-        }
-        else{
+        } else {
             $product = Product::findOrFail($id);
-        $product->update($request->all());
-        return response()->json($product);
+            $product->update($request->all());
+            return response()->json($product);
         }
     }
 
@@ -104,14 +105,27 @@ class ProductController extends Controller
     {
         $seller = \App\Models\Seller::find('seller_id');
 
-        if (!$seller){
+        if (!$seller) {
             return response()->json(['message' => 'Only seller can delete products'], 404);
-        }
-        else{
+        } else {
             $product = Product::findOrFail($id);
             $product->delete();
             return response()->json(null, 204);
         }
     }
-}
 
+    // Get all products by a specific seller
+    public function getProductsBySeller($seller_id)
+    {
+        // Find products associated with the given seller_id
+        $products = Product::where('seller_id', $seller_id)->get();
+
+        // Check if the seller has any products
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'No products found for this seller'], 404);
+        }
+
+        // Return the products as a response
+        return response()->json($products, 200);
+    }
+}

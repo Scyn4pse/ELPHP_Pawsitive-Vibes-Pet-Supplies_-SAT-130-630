@@ -38,6 +38,7 @@ Route::get('products/get-product-by-id', [ProductController::class, 'getProduct'
 Route::get('products/all-products', [ProductController::class, 'getAllProducts']);
 Route::patch('products/update-product/', [ProductController::class, 'updateProduct']);
 Route::delete('products/delete-product/', [ProductController::class, 'deleteProduct']);
+Route::get('products/seller/{seller_id}', [ProductController::class, 'getProductsBySeller']);
 //Cart routes
 Route::middleware('auth:sanctum')->post('cart/add-to-cart', [CartController::class, 'addToCart']);
 Route::get('cart/get-cart-by-id/', [CartController::class, 'getCart']);
