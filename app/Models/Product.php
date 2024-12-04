@@ -21,4 +21,8 @@ class Product extends Model
     protected $table = 'Product';
     protected $primaryKey = 'prod_id';
     public $timestamps = true;
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class, 'seller_id', 'seller_id');
+    }
 }

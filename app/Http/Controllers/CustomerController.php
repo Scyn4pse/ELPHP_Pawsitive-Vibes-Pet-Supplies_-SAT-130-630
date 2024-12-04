@@ -75,7 +75,8 @@ public function customerLogin(Request $request)
                 'message' => "$role login successful",
                 'token' => $token,
                 'role' => $role,
-                'seller_id' => $isSeller ? $user->seller_id : null, // Only return seller_id for sellers
+                'seller_id' => $isSeller ? $user->seller_id : null, 
+                'cust_id' => $isSeller ? null : $user->cust_id,
             ], 200);
         }
     }

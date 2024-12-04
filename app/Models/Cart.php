@@ -10,12 +10,25 @@ class Cart extends Model
     /** @use HasFactory<\Database\Factories\CartFactory> */
     use HasFactory;
 
+    // Specify the table name if it doesn't follow Laravel's naming convention (e.g., 'carts')
+    protected $table = 'Cart';
+
+    // Fillable fields for mass assignment
     protected $fillable = [
         'cust_id',
-        'cart_item_id',
+        // Do not include cart_item_id here if it's auto-incrementing
+    ];
+
+    // If using custom timestamps
+    protected $dates = [
         'cart_created_at',
         'cart_updated_at',
     ];
 
-    protected $table = 'Cart';
+    // Define relationships
+    public function items()
+    {
+        return $this->hasMany(CartItem::class, 'cart_id');
+    }
+
 }

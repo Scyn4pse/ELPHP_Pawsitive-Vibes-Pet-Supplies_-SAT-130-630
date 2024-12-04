@@ -44,7 +44,8 @@ Route::middleware('auth:sanctum')->patch('products/update-product/{id}', [Produc
 Route::middleware('auth:sanctum')->delete('products/delete-product/{id}', [ProductController::class, 'deleteProduct']);
 Route::get('products/seller/{seller_id}', [ProductController::class, 'getProductsBySeller']);
 //Cart routes
-Route::middleware('auth:sanctum')->post('cart/add-to-cart', [CartController::class, 'addToCart']);
+Route::post('cart/add-to-cart', [CartController::class, 'addToCart']);
+Route::get('cart/get-cart-items/', [CartController::class, 'getCartItems']);
 Route::get('cart/get-cart-by-id/', [CartController::class, 'getCart']);
 Route::get('cart/all-carts', [CartController::class, 'getAllCarts']);
 Route::patch('cart/update-cart/', [CartController::class, 'updateCart']);

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -15,21 +17,87 @@ class CartController extends Controller
     }
 
     // Create a new cart
+    // public function addtoCart(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'cust_id' => 'required|exists:customers,id',
+    //         'cart_item_id' => 'required|exists:cart_items,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['error' => $validator->errors()], 400);
+    //     }
+
+    //     $cart = Cart::create($request->all());
+    //     return response()->json($cart, 201);
+    // }
     public function addToCart(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'cust_id' => 'required|exists:customers,id',
-            'cart_item_id' => 'required|exists:cart_items,id',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'cust_id' => 'required|exists:customer,cust_id',
+        'prod_id' => 'required|exists:product,prod_id',
+        'cart_item_quantity' => 'required|integer|min:1',
+        'cart_item_price' => 'required|numeric|min:0',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        $cart = Cart::create($request->all());
-        return response()->json($cart, 201);
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 400);
     }
 
+    try {
+        $cart = Cart::firstOrCreate(
+            ['cust_id' => $request->cust_id],
+            ['cart_created_at' => now(), 'cart_updated_at' => now()]
+        );
+
+        $cartItem = CartItem::create([
+            'cart_id' => $cart->cart_id,
+            'prod_id' => $request->prod_id,
+            'cart_item_quantity' => $request->cart_item_quantity,
+            'cart_item_price' => $request->cart_item_price,
+        ]);
+
+        // Load the related product and its seller
+        $cartItem->load('product.seller');
+
+        return response()->json([
+            'message' => 'Item added to cart successfully',
+            'cart_item' => $cartItem
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
+
+
+    // Get cart items for a user
+    public function getCartItems(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'cust_id' => 'required|exists:Customer,cust_id', // Reference the correct table and column
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 400);
+    }
+
+    try {
+        $cartItems = CartItem::with('product.seller')
+            ->whereHas('cart', function ($query) use ($request) {
+                $query->where('cust_id', $request->cust_id);
+            })
+            ->get();
+
+        return response()->json(['cart_items' => $cartItems], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
+
+
+
+
+    
     // Get a specific cart
     public function getCart($id)
     {
@@ -69,4 +137,5 @@ class CartController extends Controller
         $cart->delete();
         return response()->json(null, 204);
     }
+    
 }
