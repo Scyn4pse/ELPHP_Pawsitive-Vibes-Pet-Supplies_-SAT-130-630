@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('Notifications', function (Blueprint $table) {
@@ -18,12 +15,14 @@ return new class extends Migration
             $table->string('notif_message', 225);
             $table->timestamps();
             $table->boolean('notif_is_read');
+
+            $table->foreign('user_id')->references('user_id')->on('Customers')
+                    ->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('Sellers')
+                    ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('Notifications');

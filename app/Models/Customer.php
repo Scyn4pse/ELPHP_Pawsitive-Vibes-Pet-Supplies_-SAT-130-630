@@ -14,7 +14,6 @@ class Customer extends Model
     use HasFactory;
     use HasApiTokens;
 
-    // Define which attributes are mass assignable
     protected $fillable = [
         'cust_name', 
         'cust_email',
@@ -28,7 +27,6 @@ class Customer extends Model
     protected $table = 'Customer';
     protected $primaryKey = 'cust_id';
 
-    // Define the relationship to tokens
     public function tokens()
     {
         return $this->morphMany(PersonalAccessToken::class, 'tokenable');
