@@ -40,6 +40,7 @@ class CustomerController extends Controller
 // User Login
 public function customerLogin(Request $request)
 {
+    // Validate incoming request data
     $request->validate([
         'cust_email' => 'required|email',
         'cust_password' => 'required|string|min:6',
@@ -51,33 +52,38 @@ public function customerLogin(Request $request)
     // Check if the user exists in the Seller table if not found in Customer
     $isSeller = false; // Track whether the user is a seller
     if (!$user) {
+        // Attempt to find the user in the Seller table
         $user = Seller::where('seller_email', $request->cust_email)->first();
         $isSeller = true;
     }
 
-    // Validate credentials
+    // Validate credentials if user is found
     if ($user) {
         $passwordField = $isSeller ? 'seller_password' : 'cust_password';
+        
+        // Check if password matches the stored hash
         if (Hash::check($request->cust_password, $user->$passwordField)) {
-            // Determine the role
+            // Determine the role (Seller or Customer)
             $role = $isSeller ? 'Seller' : 'Customer';
 
-            // Generate a token with a role-specific name
+            // Generate a role-specific token name
             $tokenName = $role . 'Token';
             $token = $user->createToken($tokenName)->plainTextToken;
 
+            // Return response with token and user details
             return response()->json([
                 'message' => "$role login successful",
                 'token' => $token,
                 'role' => $role,
-                'seller_id' => $user->seller_id,
+                'seller_id' => $isSeller ? $user->seller_id : null, // Only return seller_id for sellers
             ], 200);
         }
     }
 
-    // If authentication fails
+    // If authentication fails, return error message
     return response()->json(['message' => 'Invalid credentials'], 401);
 }
+
 
 
 

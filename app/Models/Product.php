@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -18,5 +17,8 @@ class Product extends Model
         'prod_quantity',
         'prod_image',
     ];
+
     protected $table = 'Product';
+    protected $primaryKey = 'prod_id';
+    public $timestamps = true;
 }

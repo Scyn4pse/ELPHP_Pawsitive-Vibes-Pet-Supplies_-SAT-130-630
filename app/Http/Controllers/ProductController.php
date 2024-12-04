@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -87,32 +87,90 @@ class ProductController extends Controller
     }
 
     // Update product details
-    public function updateProduct(Request $request, $id)
-    {
-        $seller = \App\Models\Seller::find('seller_id');
 
-        if (!$seller) {
-            return response()->json(['message' => 'Only seller can update products'], 404);
-        } else {
-            $product = Product::findOrFail($id);
-            $product->update($request->all());
-            return response()->json($product);
-        }
+    public function updateProduct(Request $request, $id)
+{
+    $id = (int) $id; 
+
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    $user = $request->user();
+    $sellerId = $user->seller_id;
+    
+    $product = Product::where('prod_id', $id)
+                      ->where('seller_id', $sellerId)  
+                      ->first();
+
+    if (!$product) {
+        return response()->json(['message' => 'Product not found or unauthorized'], 404);
+    }
+
+    try {
+        $product->prod_name = $request->input('name');
+        $product->prod_description = $request->input('description');
+        $product->prod_price = $request->input('price');
+        $product->prod_quantity = $request->input('quantity');
+        Log::info('Attempting to save product', ['product' => $product]);
+        $product->save();
+        Log::info('Product saved successfully', ['product' => $product]);
+    } catch (\Exception $e) {
+        Log::error('Error updating product', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Failed to update product'], 500);
+    }
+    
+    return response()->json($product, 200);
+}
+
+
 
     // Delete product
+
     public function deleteProduct($id)
     {
-        $seller = \App\Models\Seller::find('seller_id');
+        $id = (int) $id; 
+        // Log the incoming request and the product ID
+        Log::debug('Delete product request received', ['product_id' => $id]);
+    
+        // Retrieve the currently authenticated user
+        $user = Auth::user();
+        Log::debug('Auth status', ['auth_status' => Auth::check(), 'user' => Auth::user()]);
 
-        if (!$seller) {
-            return response()->json(['message' => 'Only seller can delete products'], 404);
-        } else {
-            $product = Product::findOrFail($id);
-            $product->delete();
-            return response()->json(null, 204);
+        if (!$user) {
+            Log::warning('No authenticated user found for product deletion', ['product_id' => $id]);
+            return response()->json(['message' => 'Only sellers can delete products'], 403);
         }
+    
+        Log::debug('Authenticated user found', ['user_id' => $user->seller_id, 'user_role' => $user->user_role]);
+    
+        // Check if the user is a seller
+        if ($user->user_role !== 'Seller') {
+            Log::warning('Unauthorized user attempted to delete product', ['user_id' => $user->seller_id, 'product_id' => $id]);
+            return response()->json(['message' => 'Only sellers can delete products'], 403);
+        }
+    
+        // Find the product
+        $product = Product::findOrFail($id);
+    
+        Log::debug('Product found for deletion', ['product_id' => $product->id, 'seller_id' => $product->seller_id]);
+    
+        // Check if the product belongs to the authenticated seller
+        if ($product->seller_id !== $user->seller_id) {
+            Log::warning('Seller attempted to delete a product they do not own', ['user_id' => $user->seller_id, 'product_id' => $id]);
+            return response()->json(['message' => 'You can only delete your own products'], 403);
+        }
+    
+        // Delete the product
+        $product->delete();
+    
+        Log::info('Product deleted successfully', ['product_id' => $id]);
+    
+        return response()->json(null, 204);
     }
+
+    
 
     // Get all products by a specific seller
     public function getProductsBySeller($seller_id)

@@ -13,6 +13,10 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\NotificationController;
 
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
 //Customer routes
 Route::post('customer/register', [CustomerController::class, 'customerSignup']);
 Route::post('customer/login', [CustomerController::class, 'customerLogin']);
@@ -36,8 +40,8 @@ Route::delete('seller/delete-seller/', [SellerController::class, 'deleteSeller']
 Route::middleware('auth:sanctum')->post('products/upload-product', [ProductController::class, 'uploadProduct']);
 Route::get('products/get-product-by-id', [ProductController::class, 'getProduct']);
 Route::get('products/all-products', [ProductController::class, 'getAllProducts']);
-Route::patch('products/update-product/', [ProductController::class, 'updateProduct']);
-Route::delete('products/delete-product/', [ProductController::class, 'deleteProduct']);
+Route::middleware('auth:sanctum')->patch('products/update-product/{id}', [ProductController::class, 'updateProduct']);
+Route::middleware('auth:sanctum')->delete('products/delete-product/{id}', [ProductController::class, 'deleteProduct']);
 Route::get('products/seller/{seller_id}', [ProductController::class, 'getProductsBySeller']);
 //Cart routes
 Route::middleware('auth:sanctum')->post('cart/add-to-cart', [CartController::class, 'addToCart']);
