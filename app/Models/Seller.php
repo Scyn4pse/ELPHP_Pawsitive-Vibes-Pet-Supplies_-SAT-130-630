@@ -11,14 +11,12 @@ use Illuminate\Notifications\Notifiable;
 
 class Seller extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\SellerFactory> */
     use HasFactory;
     use HasApiTokens;
     use Notifiable;
 
-    // Define which attributes are mass assignable
     protected $fillable = [
-        'seller_name', // Add this line to allow mass assignment for cust_name
+        'seller_name', 
         'seller_email',
         'seller_password',
         'seller_phone',
@@ -28,11 +26,9 @@ class Seller extends Authenticatable
         'seller_updated_at',
     ];
 
-    // Optionally, you can also define the table name if it is not the plural of the model name
     protected $table = 'Seller';
     protected $primaryKey = 'seller_id';
 
-    // Define the relationship to tokens
     public function tokens()
     {
         return $this->morphMany(PersonalAccessToken::class, 'tokenable');

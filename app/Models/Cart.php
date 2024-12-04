@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    /** @use HasFactory<\Database\Factories\CartFactory> */
     use HasFactory;
 
     // Specify the table name if it doesn't follow Laravel's naming convention (e.g., 'carts')

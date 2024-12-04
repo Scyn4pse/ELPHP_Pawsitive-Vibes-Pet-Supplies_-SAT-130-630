@@ -10,27 +10,21 @@ use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
-    // Get all products
     public function index()
     {
         return response()->json(Product::all());
     }
 
-    // Create a new product
     public function uploadProduct(Request $request)
     {
-        // Get the authenticated seller using Sanctum
         $seller = auth('api')->user();
 
-        // Check if the seller is authenticated
         if (!$seller) {
             return response()->json(['message' => 'Only sellers can upload products'], 403);
         }
 
-        // Log the authenticated seller's ID for debugging
         Log::info('Authenticated Seller:', ['seller_id' => $seller->seller_id]);
 
-        // Validate the product details
         $validator = Validator::make($request->all(), [
             'prod_name' => 'required|string|max:255',
             'prod_description' => 'required|string',
@@ -39,12 +33,10 @@ class ProductController extends Controller
             'prod_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 400);
         }
 
-        // Handle the image file upload
         $imageUrl = null;
         if ($request->hasFile('prod_image')) {
             $file = $request->file('prod_image');
@@ -52,11 +44,9 @@ class ProductController extends Controller
             $file->move(public_path('images'), $filename);
             $imageUrl = 'images/' . $filename;
         }
-
-        // Attempt to create the product
         try {
             $product = Product::create([
-                'seller_id' => $seller->seller_id, // Use the authenticated seller's ID
+                'seller_id' => $seller->seller_id, 
                 'prod_name' => $request->input('prod_name'),
                 'prod_description' => $request->input('prod_description'),
                 'prod_price' => $request->input('prod_price'),
@@ -72,7 +62,6 @@ class ProductController extends Controller
             return response()->json(['error' => 'Product creation failed: ' . $e->getMessage()], 500);
         }
 
-        // Return the created product as a response
         return response()->json($product, 201);
     }
     public function getProduct($id)
@@ -86,7 +75,6 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    // Update product details
 
     public function updateProduct(Request $request, $id)
 {
@@ -126,15 +114,11 @@ class ProductController extends Controller
 
 
 
-    // Delete product
-
     public function deleteProduct($id)
     {
         $id = (int) $id; 
-        // Log the incoming request and the product ID
         Log::debug('Delete product request received', ['product_id' => $id]);
     
-        // Retrieve the currently authenticated user
         $user = Auth::user();
         Log::debug('Auth status', ['auth_status' => Auth::check(), 'user' => Auth::user()]);
 
@@ -145,24 +129,20 @@ class ProductController extends Controller
     
         Log::debug('Authenticated user found', ['user_id' => $user->seller_id, 'user_role' => $user->user_role]);
     
-        // Check if the user is a seller
         if ($user->user_role !== 'Seller') {
             Log::warning('Unauthorized user attempted to delete product', ['user_id' => $user->seller_id, 'product_id' => $id]);
             return response()->json(['message' => 'Only sellers can delete products'], 403);
         }
     
-        // Find the product
         $product = Product::findOrFail($id);
     
         Log::debug('Product found for deletion', ['product_id' => $product->id, 'seller_id' => $product->seller_id]);
     
-        // Check if the product belongs to the authenticated seller
         if ($product->seller_id !== $user->seller_id) {
             Log::warning('Seller attempted to delete a product they do not own', ['user_id' => $user->seller_id, 'product_id' => $id]);
             return response()->json(['message' => 'You can only delete your own products'], 403);
         }
     
-        // Delete the product
         $product->delete();
     
         Log::info('Product deleted successfully', ['product_id' => $id]);
@@ -170,20 +150,13 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 
-    
-
-    // Get all products by a specific seller
     public function getProductsBySeller($seller_id)
     {
-        // Find products associated with the given seller_id
         $products = Product::where('seller_id', $seller_id)->get();
 
-        // Check if the seller has any products
         if ($products->isEmpty()) {
             return response()->json(['message' => 'No products found for this seller'], 404);
         }
-
-        // Return the products as a response
         return response()->json($products, 200);
     }
 }

@@ -6,12 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('Order', function (Blueprint $table) {
+        Schema::create('Orders', function (Blueprint $table) {
             $table->id('order_id');
             $table->unsignedBigInteger('cust_id');
             $table->unsignedBigInteger('order_item_id');
@@ -27,13 +24,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('Order');
-        Schema::table('Order', function (Blueprint $table) {
+        Schema::dropIfExists('Orders');
+        Schema::table('Orders', function (Blueprint $table) {
             $table->dropTimestamps();
         });
     }

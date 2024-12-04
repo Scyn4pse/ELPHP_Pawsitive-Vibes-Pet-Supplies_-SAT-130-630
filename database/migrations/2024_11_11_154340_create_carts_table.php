@@ -6,19 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('Cart', function (Blueprint $table) {
+        Schema::create('Carts', function (Blueprint $table) {
             $table->id('cart_id');
             $table->unsignedBigInteger('cust_id')->constrained()->onDelete('cascade');;
             $table->timestamps();
 
-            $table->foreign('cust_id')->references('cust_id')->on('Customer')
+            $table->foreign('cust_id')->references('cust_id')->on('Customers')
                     ->onDelete('cascade');
-            $table->foreign('cust_id')->references('cust_id')->on('Customer')
+            $table->foreign('cust_id')->references('cust_id')->on('Customers')
                     ->onDelete('cascade');
         });
     }
@@ -28,8 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('Cart');
-        Schema::table('Cart', function (Blueprint $table) {
+        Schema::dropIfExists('Carts');
+        Schema::table('Carts', function (Blueprint $table) {
             $table->dropTimestamps();
         });
     }

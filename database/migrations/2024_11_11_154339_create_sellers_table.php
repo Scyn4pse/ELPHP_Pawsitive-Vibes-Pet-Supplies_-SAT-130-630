@@ -6,12 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('Seller', function (Blueprint $table) {
+        Schema::create('Sellers', function (Blueprint $table) {
             $table->id('seller_id');
             $table->string('seller_name', 255);
             $table->string('seller_email', 255)->unique();
@@ -24,15 +21,11 @@ return new class extends Migration
         });
     }
 
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('Seller');
-        Schema::table('Seller', function (Blueprint $table) {
-        $table->dropTimestamps(); // This will remove the 'created_at' and 'updated_at' columns
+        Schema::dropIfExists('Sellers');
+        Schema::table('Sellers', function (Blueprint $table) {
+        $table->dropTimestamps();
     });
     }
 };

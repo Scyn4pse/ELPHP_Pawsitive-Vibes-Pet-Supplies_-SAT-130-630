@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    // Get all carts
     public function index()
     {
         return response()->json(Cart::all());
@@ -108,29 +107,24 @@ class CartController extends Controller
         $carts = Cart::all();
         return response()->json($carts);
     }
-    // Update cart details
     public function updateCart(Request $request, $id)
     {
         $cart = Cart::findOrFail($id);
 
-        // Validate incoming request data
         $validator = Validator::make($request->all(), [
             'item_id' => 'sometimes|required|integer|exists:items,id',
             'quantity' => 'sometimes|required|integer|min:1',
             'price' => 'sometimes|required|numeric|min:0',
-            // Add other fields as necessary
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        // Update the cart
         $cart->update($request->all());
         return response()->json($cart, 200);
     }
 
-    // Delete cart
     public function deleteCart($id)
     {
         $cart = Cart::findOrFail($id);
