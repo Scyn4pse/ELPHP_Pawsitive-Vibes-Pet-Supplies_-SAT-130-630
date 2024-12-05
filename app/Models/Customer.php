@@ -24,7 +24,7 @@ class Customer extends Model
         'cust_created_at',
         'cust_updated_at',
     ];
-    protected $table = 'Customer';
+    protected $table = 'Customers';
     protected $primaryKey = 'cust_id';
 
     public function tokens()

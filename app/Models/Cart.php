@@ -10,7 +10,7 @@ class Cart extends Model
     use HasFactory;
 
     // Specify the table name if it doesn't follow Laravel's naming convention (e.g., 'carts')
-    protected $table = 'Cart';
+    protected $table = 'Carts';
 
     // Fillable fields for mass assignment
     protected $fillable = [

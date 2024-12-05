@@ -26,7 +26,7 @@ class Seller extends Authenticatable
         'seller_updated_at',
     ];
 
-    protected $table = 'Seller';
+    protected $table = 'Sellers';
     protected $primaryKey = 'seller_id';
 
     public function tokens()

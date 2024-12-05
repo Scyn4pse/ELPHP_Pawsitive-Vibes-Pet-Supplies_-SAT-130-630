@@ -33,8 +33,8 @@ class CartController extends Controller
     public function addToCart(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'cust_id' => 'required|exists:customer,cust_id',
-        'prod_id' => 'required|exists:product,prod_id',
+        'cust_id' => 'required|exists:customers,cust_id',
+        'prod_id' => 'required|exists:products,prod_id',
         'cart_item_quantity' => 'required|integer|min:1',
         'cart_item_price' => 'required|numeric|min:0',
     ]);

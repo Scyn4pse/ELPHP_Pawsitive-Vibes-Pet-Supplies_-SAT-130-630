@@ -18,5 +18,5 @@ class Notification extends Model
         'notif_updated_at',
     ];
     
-    protected $table = 'Notification';
+    protected $table = 'Notifications';
 }

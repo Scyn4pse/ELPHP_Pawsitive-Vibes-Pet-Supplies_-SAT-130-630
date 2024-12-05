@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('order_status',225);
             $table->timestamps();
 
-            $table->foreign('cust_id')->references('cust_id')->on('Customer')
+            $table->foreign('cust_id')->references('cust_id')->on('Customers')
                     ->onDelete('cascade');
             $table->foreign('order_item_id')->references('order_item_id')->on('OrderItem')
                     ->onDelete('cascade');

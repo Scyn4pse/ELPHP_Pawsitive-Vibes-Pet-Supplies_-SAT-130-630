@@ -16,6 +16,6 @@ class OrderItem extends Model
         'order_item_price',
     ];
 
-    protected $table = 'OrderItem';
+    protected $table = 'OrderItems';
 
 }

@@ -19,5 +19,5 @@ class Order extends Model
         'order_created_at',
         'order_updated_at',
     ];
-    protected $table = 'Order';
+    protected $table = 'Orders';
 }

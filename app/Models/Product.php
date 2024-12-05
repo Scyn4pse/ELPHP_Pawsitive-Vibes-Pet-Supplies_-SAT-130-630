@@ -18,7 +18,7 @@ class Product extends Model
         'prod_image',
     ];
 
-    protected $table = 'Product';
+    protected $table = 'Products';
     protected $primaryKey = 'prod_id';
     public $timestamps = true;
     public function seller()

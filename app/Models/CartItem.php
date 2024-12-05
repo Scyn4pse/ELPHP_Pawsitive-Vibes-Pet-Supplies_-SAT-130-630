@@ -16,7 +16,7 @@ class CartItem extends Model
         'cart_item_price',
     ];
     
-    protected $table = 'CartItem';
+    protected $table = 'CartItems';
     protected $primaryKey = 'cart_item_id';
     public function cart()
 {

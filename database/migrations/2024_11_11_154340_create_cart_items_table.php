@@ -16,8 +16,8 @@ return new class extends Migration
                 $table->double('cart_item_price');
                 $table->timestamps(0);
                 
-                $table->foreign('cart_id')->references('cart_id')->on('Cart')->onDelete('cascade');
-                $table->foreign('prod_id')->references('prod_id')->on('Product')
+                $table->foreign('cart_id')->references('cart_id')->on('Carts')->onDelete('cascade');
+                $table->foreign('prod_id')->references('prod_id')->on('Products')
                         ->onDelete('cascade');
             });
         }
